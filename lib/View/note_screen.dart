@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:note_application/Color/custom_color.dart';
+import 'package:note_application/Controller/FIrebase_note_controller.dart';
 import 'package:note_application/Controller/notes_controllers.dart';
 import 'package:note_application/Model/notes_nodel.dart';
 
@@ -12,7 +14,7 @@ class NoteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
 
-    final controller = Get.put(NotesController());
+    final controller = Get.put(FirebaseNoteController());
 
     final arg = Get.arguments != null ?Get.arguments as Map
         : {
@@ -21,14 +23,15 @@ class NoteScreen extends StatelessWidget {
     };
 
     final bool isUpdate = arg['isUpdate'] ?? false;
-    final note = arg['note'] == null ? null : arg['note']as NotesModel;
-    final int? index = arg['index'] == null ? null : arg['index'] as int;
+    final note = arg['note'] == null ? null : arg['note'] as QueryDocumentSnapshot<Map<String, dynamic>>;
+   final int? index = arg['index'] == null ? null : arg['index'] as int;
 
+   DateTime createDate = arg['note'] == null ? DateTime.now() : (note!['create_date'] as Timestamp).toDate();
     final titleController = TextEditingController(
-      text: isUpdate ? note!.title : null,
+      text: isUpdate ? note!['title'] : null,
     );
     final descriptionController = TextEditingController(
-      text: isUpdate ? note!.description : null
+      text: isUpdate ? note!['description'] : null
     );
 
 
@@ -86,16 +89,22 @@ class NoteScreen extends StatelessWidget {
                     if(titleController.text.isEmpty || descriptionController.text.isEmpty){
                       Get.snackbar('Error', "Title and description required",
                            );
-                    }else{isUpdate ? controller.updateNotes(index!, NotesModel(
+                    }else{
+                      isUpdate ?
+                      controller.updateNotes(
+                        note!.id,
+                        NotesModel(
                         title: titleController.text,
                         description: descriptionController.text,
-                        createDate: note!.createDate,
-                        updateDate: DateTime.now()))
+                       // createDate: note!['create_date'],
+                       // updateDate: DateTime.now()
+                        ))
                        : controller.addNotes(
                           NotesModel(
                               title: titleController.text,
                               description: descriptionController.text,
-                              createDate: DateTime.now()));
+                              // createDate: DateTime.now()
+                          ));
                       Get.back();
                     }
                   },
