@@ -24,9 +24,9 @@ class NoteScreen extends StatelessWidget {
 
     final bool isUpdate = arg['isUpdate'] ?? false;
     final note = arg['note'] == null ? null : arg['note'] as QueryDocumentSnapshot<Map<String, dynamic>>;
-   final int? index = arg['index'] == null ? null : arg['index'] as int;
+   // final int? index = arg['index'] == null ? null : arg['index'] as int;
 
-   DateTime createDate = arg['note'] == null ? DateTime.now() : (note!['create_date'] as Timestamp).toDate();
+   // DateTime createDate = arg['note'] == null ? DateTime.now() : (note!['create_date'] as Timestamp).toDate();
     final titleController = TextEditingController(
       text: isUpdate ? note!['title'] : null,
     );
